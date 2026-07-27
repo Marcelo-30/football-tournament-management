@@ -1,4 +1,4 @@
-package com.footballtournament.management.entity;
+package com.footballtournament.management.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tournament_matches")
-public class TournamentMatch {
+public class TournamentMatchEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,12 +31,12 @@ public class TournamentMatch {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "tournament_id", nullable = false)
-    private Tournament tournament;
+    private TournamentEntity tournament;
 
-    public TournamentMatch() {
+    public TournamentMatchEntity() {
     }
 
-    public TournamentMatch(
+    public TournamentMatchEntity(
             String homeTeam,
             String awayTeam,
             LocalDateTime scheduledAt
@@ -78,11 +78,11 @@ public class TournamentMatch {
         this.scheduledAt = scheduledAt;
     }
 
-    public Tournament getTournament() {
+    public TournamentEntity getTournament() {
         return tournament;
     }
 
-    public void setTournament(Tournament tournament) {
-        this.tournament = tournament;
+    public void setTournament(TournamentEntity tournamentEntity) {
+        this.tournament = tournamentEntity;
     }
 }
