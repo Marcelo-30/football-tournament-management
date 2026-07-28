@@ -1,88 +1,51 @@
 package com.footballtournament.management.service;
 
 import com.footballtournament.management.domain.model.TournamentMatch;
-import com.footballtournament.management.persistence.entity.TournamentEntity;
-import com.footballtournament.management.persistence.entity.TournamentMatchEntity;
-import com.footballtournament.management.persistence.mapper.TournamentMatchMapper;
-import com.footballtournament.management.persistence.repository.TournamentMatchRepository;
-import com.footballtournament.management.persistence.repository.TournamentRepository;
+import com.footballtournament.management.domain.repository.TournamentMatchRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
+import java.time.LocalDateTime;
 
 @Service
 public class TournamentMatchService {
 
     private final TournamentMatchRepository matchRepository;
-    private final TournamentRepository tournamentRepository;
-    private final TournamentMatchMapper matchMapper;
 
     public TournamentMatchService(
-            TournamentMatchRepository matchRepository,
-            TournamentRepository tournamentRepository,
-            TournamentMatchMapper matchMapper
+            TournamentMatchRepository matchRepository
     ) {
         this.matchRepository = matchRepository;
-        this.tournamentRepository = tournamentRepository;
-        this.matchMapper = matchMapper;
     }
 
     public List<TournamentMatch> findAll() {
-        return StreamSupport
-                .stream(matchRepository.findAll().spliterator(), false)
-                .map(matchMapper::toDomain)
-                .toList();
+        return matchRepository.findAll();
     }
 
     public Optional<TournamentMatch> findById(Integer id) {
-        return matchRepository
-                .findById(id)
-                .map(matchMapper::toDomain);
+        return matchRepository.findById(id);
     }
 
     public List<TournamentMatch> findByTournamentId(
             Integer tournamentId
     ) {
-        return matchRepository
-                .findByTournament_Id(tournamentId)
-                .stream()
-                .map(matchMapper::toDomain)
-                .toList();
+        return matchRepository.findByTournamentId(tournamentId);
     }
 
     public List<TournamentMatch> findByTeam(String team) {
-        return matchRepository
-                .findByHomeTeamIgnoreCaseOrAwayTeamIgnoreCase(
-                        team,
-                        team
-                )
-                .stream()
-                .map(matchMapper::toDomain)
-                .toList();
+        return matchRepository.findByTeam(team);
     }
 
     public Optional<TournamentMatch> save(
             Integer tournamentId,
             TournamentMatch tournamentMatch
     ) {
-        Optional<TournamentEntity> tournamentOptional =
-                tournamentRepository.findById(tournamentId);
-
-        if (tournamentOptional.isEmpty()) {
-            return Optional.empty();
+        if (tournamentMatch.getScheduledAt() == null) {
+            tournamentMatch.setScheduledAt(LocalDateTime.now());
         }
 
-        TournamentMatchEntity matchEntity =
-                matchMapper.toEntity(tournamentMatch);
-
-        matchEntity.setTournament(tournamentOptional.get());
-
-        TournamentMatchEntity savedMatch =
-                matchRepository.save(matchEntity);
-
-        return Optional.of(matchMapper.toDomain(savedMatch));
+        return matchRepository.save(tournamentId, tournamentMatch);
     }
 
     public boolean deleteById(Integer id) {
