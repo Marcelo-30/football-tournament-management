@@ -34,6 +34,13 @@ public class TournamentEntity {
     )
     private List<TournamentMatchEntity> matches = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "tournament",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<TeamEntity> teams = new ArrayList<>();
+
     public TournamentEntity() {
     }
 
