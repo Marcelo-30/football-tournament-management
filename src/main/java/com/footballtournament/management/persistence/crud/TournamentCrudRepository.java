@@ -1,4 +1,4 @@
-package com.footballtournament.management.persistence.repository;
+package com.footballtournament.management.persistence.crud;
 
 import com.footballtournament.management.persistence.entity.TournamentEntity;
 import org.springframework.data.repository.CrudRepository;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TournamentRepository
+public interface TournamentCrudRepository
         extends CrudRepository<TournamentEntity, Integer> {
 
     List<TournamentEntity> findBySeasonIgnoreCase(String season);
