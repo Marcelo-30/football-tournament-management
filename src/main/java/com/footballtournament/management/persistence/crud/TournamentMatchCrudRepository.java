@@ -13,7 +13,7 @@ public interface TournamentMatchCrudRepository
     List<TournamentMatchEntity> findByTournament_Id(Integer tournamentId);
 
     List<TournamentMatchEntity>
-    findByHomeTeamIgnoreCaseOrAwayTeamIgnoreCase(
+    findByHomeTeam_NameIgnoreCaseOrAwayTeam_NameIgnoreCase(
             String homeTeam,
             String awayTeam
     );

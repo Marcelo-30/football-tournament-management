@@ -91,12 +91,9 @@ public class TournamentMatchController {
             description = "Internal server error"
     )
     public ResponseEntity<TournamentMatch> findById(
-            @Parameter(
-                    description = "Tournament match ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("id") Integer id
+            @Parameter(description = "Tournament match ID", example = "1",
+                    required = true)
+            @PathVariable() Integer id
     ) {
         return matchService
                 .findById(id)
@@ -126,12 +123,9 @@ public class TournamentMatchController {
             description = "Internal server error"
     )
     public ResponseEntity<List<TournamentMatch>> findByTournamentId(
-            @Parameter(
-                    description = "Tournament ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("tournamentId") Integer tournamentId
+            @Parameter(description = "Tournament ID", example = "1",
+                    required = true)
+            @PathVariable() Integer tournamentId
     ) {
         List<TournamentMatch> matches =
                 matchService.findByTournamentId(tournamentId);
@@ -157,8 +151,9 @@ public class TournamentMatchController {
                                     name = "Tournament match example",
                                     value = """
                                             {
-                                              "homeTeam": "Tigres",
-                                              "awayTeam": "Monterrey"
+                                              "homeTeamId": 1,
+                                              "awayTeamId": 2,
+                                              "scheduledAt": "2026-08-03T18:00:00"
                                             }
                                             """
                             )
@@ -175,19 +170,16 @@ public class TournamentMatchController {
     )
     @ApiResponse(
             responseCode = "404",
-            description = "Tournament not found"
+            description = "Tournament or one of the teams was not found"
     )
     @ApiResponse(
             responseCode = "500",
             description = "Internal server error"
     )
     public ResponseEntity<TournamentMatch> save(
-            @Parameter(
-                    description = "ID of the tournament to which the match belongs",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("tournamentId") Integer tournamentId,
+            @Parameter(description = "ID of the tournament to which the match belongs", example = "1",
+                    required = true)
+            @PathVariable() Integer tournamentId,
 
             @RequestBody TournamentMatch tournamentMatch
     ) {
@@ -227,12 +219,9 @@ public class TournamentMatchController {
             description = "Internal server error"
     )
     public ResponseEntity<Void> deleteById(
-            @Parameter(
-                    description = "Tournament match ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("id") Integer id
+            @Parameter(description = "Tournament match ID", example = "1",
+                    required = true)
+            @PathVariable() Integer id
     ) {
         boolean deleted = matchService.deleteById(id);
 
@@ -241,5 +230,13 @@ public class TournamentMatchController {
         }
 
         return ResponseEntity.noContent().build();
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(
+            IllegalArgumentException exception
+    ) {
+        return ResponseEntity
+                .badRequest()
+                .body(exception.getMessage());
     }
 }

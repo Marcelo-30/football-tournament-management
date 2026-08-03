@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class TournamentMatchService {
@@ -41,11 +42,30 @@ public class TournamentMatchService {
             Integer tournamentId,
             TournamentMatch tournamentMatch
     ) {
+        if (tournamentMatch.getHomeTeamId() == null
+                || tournamentMatch.getAwayTeamId() == null) {
+            throw new IllegalArgumentException(
+                    "Home team and away team are required"
+            );
+        }
+
+        if (Objects.equals(
+                tournamentMatch.getHomeTeamId(),
+                tournamentMatch.getAwayTeamId()
+        )) {
+            throw new IllegalArgumentException(
+                    "Home team and away team must be different"
+            );
+        }
+
         if (tournamentMatch.getScheduledAt() == null) {
             tournamentMatch.setScheduledAt(LocalDateTime.now());
         }
 
-        return matchRepository.save(tournamentId, tournamentMatch);
+        return matchRepository.save(
+                tournamentId,
+                tournamentMatch
+        );
     }
 
     public boolean deleteById(Integer id) {
