@@ -61,12 +61,9 @@ public class PlayerController {
             description = "Player not found"
     )
     public ResponseEntity<Player> findById(
-            @Parameter(
-                    description = "Player ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("id") Integer id
+            @Parameter(description = "Player ID", example = "1",
+                    required = true)
+            @PathVariable() Integer id
     ) {
         return playerService.findById(id)
                 .map(ResponseEntity::ok)
@@ -89,12 +86,9 @@ public class PlayerController {
             description = "No players found for the team"
     )
     public ResponseEntity<List<Player>> findByTeamId(
-            @Parameter(
-                    description = "Team ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("teamId") Integer teamId
+            @Parameter(description = "Team ID", example = "1",
+                    required = true)
+            @PathVariable() Integer teamId
     ) {
         List<Player> players =
                 playerService.findByTeamId(teamId);
@@ -145,12 +139,9 @@ public class PlayerController {
             description = "Internal server error"
     )
     public ResponseEntity<Player> save(
-            @Parameter(
-                    description = "Team ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("teamId") Integer teamId,
+            @Parameter(description = "Team ID", example = "1",
+                    required = true)
+            @PathVariable() Integer teamId,
 
             @RequestBody Player player
     ) {
@@ -179,13 +170,9 @@ public class PlayerController {
             description = "Player not found"
     )
     public ResponseEntity<Void> deleteById(
-            @Parameter(
-                    description = "Player ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("id") Integer id
-    ) {
+            @Parameter(description = "Player ID", example = "1",
+                    required = true)
+            @PathVariable() Integer id) {
         boolean deleted = playerService.deleteById(id);
 
         if (!deleted) {

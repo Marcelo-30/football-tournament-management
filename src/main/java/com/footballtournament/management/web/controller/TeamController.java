@@ -59,13 +59,9 @@ public class TeamController {
             description = "Team not found"
     )
     public ResponseEntity<Team> findById(
-            @Parameter(
-                    description = "Team ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("id") Integer id
-    ) {
+            @Parameter(description = "Team ID", example = "1",
+                    required = true)
+            @PathVariable() Integer id) {
         return teamService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(
@@ -87,13 +83,9 @@ public class TeamController {
             description = "No teams found for the tournament"
     )
     public ResponseEntity<List<Team>> findByTournamentId(
-            @Parameter(
-                    description = "Tournament ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("tournamentId") Integer tournamentId
-    ) {
+            @Parameter(description = "Tournament ID", example = "1",
+                    required = true)
+            @PathVariable() Integer tournamentId) {
         List<Team> teams =
                 teamService.findByTournamentId(tournamentId);
 
@@ -142,12 +134,9 @@ public class TeamController {
             description = "Internal server error"
     )
     public ResponseEntity<Team> save(
-            @Parameter(
-                    description = "Tournament ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("tournamentId") Integer tournamentId,
+            @Parameter(description = "Tournament ID", example = "1",
+                    required = true)
+            @PathVariable() Integer tournamentId,
 
             @RequestBody Team team
     ) {
@@ -176,13 +165,9 @@ public class TeamController {
             description = "Team not found"
     )
     public ResponseEntity<Void> deleteById(
-            @Parameter(
-                    description = "Team ID",
-                    example = "1",
-                    required = true
-            )
-            @PathVariable("id") Integer id
-    ) {
+            @Parameter(description = "Team ID", example = "1",
+                    required = true)
+            @PathVariable() Integer id) {
         boolean deleted = teamService.deleteById(id);
 
         if (!deleted) {
