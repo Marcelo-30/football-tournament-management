@@ -1,9 +1,9 @@
 package com.footballtournament.management.web.controller;
 
+import static com.footballtournament.management.web.response.ResponseHeader.MESSAGE;
 import com.footballtournament.management.domain.model.Player;
 import com.footballtournament.management.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,8 +43,17 @@ public class PlayerController {
             responseCode = "500",
             description = "Internal server error"
     )
+
     public ResponseEntity<List<Player>> findAll() {
-        return ResponseEntity.ok(playerService.findAll());
+        List<Player> players = playerService.findAll();
+
+        return ResponseEntity
+                .ok()
+                .header(
+                        MESSAGE,
+                        "Players retrieved successfully"
+                )
+                .body(players);
     }
 
     @GetMapping("/{id}")
@@ -60,15 +69,28 @@ public class PlayerController {
             responseCode = "404",
             description = "Player not found"
     )
+
     public ResponseEntity<Player> findById(
-            @Parameter(description = "Player ID", example = "1",
-                    required = true)
-            @PathVariable() Integer id
+            @PathVariable Integer id
     ) {
         return playerService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(
-                        () -> ResponseEntity.notFound().build()
+                .map(player ->
+                        ResponseEntity
+                                .ok()
+                                .header(
+                                        MESSAGE,
+                                        "Player retrieved successfully"
+                                )
+                                .body(player)
+                )
+                .orElseGet(() ->
+                        ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .header(
+                                        MESSAGE,
+                                        "Player with ID " + id + " was not found"
+                                )
+                                .build()
                 );
     }
 
@@ -85,19 +107,30 @@ public class PlayerController {
             responseCode = "404",
             description = "No players found for the team"
     )
+
     public ResponseEntity<List<Player>> findByTeamId(
-            @Parameter(description = "Team ID", example = "1",
-                    required = true)
-            @PathVariable() Integer teamId
+            @PathVariable Integer teamId
     ) {
         List<Player> players =
                 playerService.findByTeamId(teamId);
 
         if (players.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .header(
+                            MESSAGE,
+                            "No players were found for team with ID " + teamId
+                    )
+                    .build();
         }
 
-        return ResponseEntity.ok(players);
+        return ResponseEntity
+                .ok()
+                .header(
+                        MESSAGE,
+                        "Players retrieved successfully"
+                )
+                .body(players);
     }
 
     @PostMapping("/team/{teamId}")
@@ -138,21 +171,29 @@ public class PlayerController {
             responseCode = "500",
             description = "Internal server error"
     )
-    public ResponseEntity<Player> save(
-            @Parameter(description = "Team ID", example = "1",
-                    required = true)
-            @PathVariable() Integer teamId,
 
+    public ResponseEntity<Player> save(
+            @PathVariable Integer teamId,
             @RequestBody Player player
     ) {
         return playerService.save(teamId, player)
                 .map(savedPlayer ->
                         ResponseEntity
                                 .status(HttpStatus.CREATED)
+                                .header(
+                                        MESSAGE,
+                                        "Player created successfully"
+                                )
                                 .body(savedPlayer)
                 )
-                .orElseGet(
-                        () -> ResponseEntity.notFound().build()
+                .orElseGet(() ->
+                        ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .header(
+                                        MESSAGE,
+                                        "Team with ID " + teamId + " was not found"
+                                )
+                                .build()
                 );
     }
 
@@ -169,16 +210,28 @@ public class PlayerController {
             responseCode = "404",
             description = "Player not found"
     )
+
     public ResponseEntity<Void> deleteById(
-            @Parameter(description = "Player ID", example = "1",
-                    required = true)
-            @PathVariable() Integer id) {
+            @PathVariable Integer id
+    ) {
         boolean deleted = playerService.deleteById(id);
 
         if (!deleted) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .header(
+                            MESSAGE,
+                            "Player with ID " + id + " was not found"
+                    )
+                    .build();
         }
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .header(
+                        MESSAGE,
+                        "Player deleted successfully"
+                )
+                .build();
     }
 }

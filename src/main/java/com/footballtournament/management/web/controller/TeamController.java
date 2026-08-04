@@ -1,9 +1,9 @@
 package com.footballtournament.management.web.controller;
 
+import static com.footballtournament.management.web.response.ResponseHeader.MESSAGE;
 import com.footballtournament.management.domain.model.Team;
 import com.footballtournament.management.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,8 +41,17 @@ public class TeamController {
             responseCode = "500",
             description = "Internal server error"
     )
+
     public ResponseEntity<List<Team>> findAll() {
-        return ResponseEntity.ok(teamService.findAll());
+        List<Team> teams = teamService.findAll();
+
+        return ResponseEntity
+                .ok()
+                .header(
+                        MESSAGE,
+                        "Teams retrieved successfully"
+                )
+                .body(teams);
     }
 
     @GetMapping("/{id}")
@@ -58,14 +67,28 @@ public class TeamController {
             responseCode = "404",
             description = "Team not found"
     )
+
     public ResponseEntity<Team> findById(
-            @Parameter(description = "Team ID", example = "1",
-                    required = true)
-            @PathVariable() Integer id) {
+            @PathVariable Integer id
+    ) {
         return teamService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(
-                        () -> ResponseEntity.notFound().build()
+                .map(team ->
+                        ResponseEntity
+                                .ok()
+                                .header(
+                                        MESSAGE,
+                                        "Team retrieved successfully"
+                                )
+                                .body(team)
+                )
+                .orElseGet(() ->
+                        ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .header(
+                                        MESSAGE,
+                                        "Team with ID " + id + " was not found"
+                                )
+                                .build()
                 );
     }
 
@@ -82,18 +105,31 @@ public class TeamController {
             responseCode = "404",
             description = "No teams found for the tournament"
     )
+
     public ResponseEntity<List<Team>> findByTournamentId(
-            @Parameter(description = "Tournament ID", example = "1",
-                    required = true)
-            @PathVariable() Integer tournamentId) {
+            @PathVariable Integer tournamentId
+    ) {
         List<Team> teams =
                 teamService.findByTournamentId(tournamentId);
 
         if (teams.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .header(
+                            MESSAGE,
+                            "No teams were found for tournament with ID "
+                                    + tournamentId
+                    )
+                    .build();
         }
 
-        return ResponseEntity.ok(teams);
+        return ResponseEntity
+                .ok()
+                .header(
+                        MESSAGE,
+                        "Teams retrieved successfully"
+                )
+                .body(teams);
     }
 
     @PostMapping("/tournament/{tournamentId}")
@@ -133,21 +169,31 @@ public class TeamController {
             responseCode = "500",
             description = "Internal server error"
     )
-    public ResponseEntity<Team> save(
-            @Parameter(description = "Tournament ID", example = "1",
-                    required = true)
-            @PathVariable() Integer tournamentId,
 
+    public ResponseEntity<Team> save(
+            @PathVariable Integer tournamentId,
             @RequestBody Team team
     ) {
         return teamService.save(tournamentId, team)
                 .map(savedTeam ->
                         ResponseEntity
                                 .status(HttpStatus.CREATED)
+                                .header(
+                                        MESSAGE,
+                                        "Team created successfully"
+                                )
                                 .body(savedTeam)
                 )
-                .orElseGet(
-                        () -> ResponseEntity.notFound().build()
+                .orElseGet(() ->
+                        ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .header(
+                                        MESSAGE,
+                                        "Tournament with ID "
+                                                + tournamentId
+                                                + " was not found"
+                                )
+                                .build()
                 );
     }
 
@@ -164,16 +210,28 @@ public class TeamController {
             responseCode = "404",
             description = "Team not found"
     )
+
     public ResponseEntity<Void> deleteById(
-            @Parameter(description = "Team ID", example = "1",
-                    required = true)
-            @PathVariable() Integer id) {
+            @PathVariable Integer id
+    ) {
         boolean deleted = teamService.deleteById(id);
 
         if (!deleted) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .header(
+                            MESSAGE,
+                            "Team with ID " + id + " was not found"
+                    )
+                    .build();
         }
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .header(
+                        MESSAGE,
+                        "Team deleted successfully"
+                )
+                .build();
     }
 }
