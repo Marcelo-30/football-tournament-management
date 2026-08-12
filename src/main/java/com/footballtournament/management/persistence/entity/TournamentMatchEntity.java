@@ -20,11 +20,13 @@ public class TournamentMatchEntity {
     @Column(name = "match_id")
     private Integer id;
 
-    @Column(name = "home_team", nullable = false, length = 100)
-    private String homeTeam;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "home_team_id", nullable = false)
+    private TeamEntity homeTeam;
 
-    @Column(name = "away_team", nullable = false, length = 100)
-    private String awayTeam;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "away_team_id", nullable = false)
+    private TeamEntity awayTeam;
 
     @Column(name = "scheduled_at", nullable = false)
     private LocalDateTime scheduledAt;
@@ -36,16 +38,6 @@ public class TournamentMatchEntity {
     public TournamentMatchEntity() {
     }
 
-    public TournamentMatchEntity(
-            String homeTeam,
-            String awayTeam,
-            LocalDateTime scheduledAt
-    ) {
-        this.homeTeam = homeTeam;
-        this.awayTeam = awayTeam;
-        this.scheduledAt = scheduledAt;
-    }
-
     public Integer getId() {
         return id;
     }
@@ -54,19 +46,19 @@ public class TournamentMatchEntity {
         this.id = id;
     }
 
-    public String getHomeTeam() {
+    public TeamEntity getHomeTeam() {
         return homeTeam;
     }
 
-    public void setHomeTeam(String homeTeam) {
+    public void setHomeTeam(TeamEntity homeTeam) {
         this.homeTeam = homeTeam;
     }
 
-    public String getAwayTeam() {
+    public TeamEntity getAwayTeam() {
         return awayTeam;
     }
 
-    public void setAwayTeam(String awayTeam) {
+    public void setAwayTeam(TeamEntity awayTeam) {
         this.awayTeam = awayTeam;
     }
 
@@ -82,7 +74,7 @@ public class TournamentMatchEntity {
         return tournament;
     }
 
-    public void setTournament(TournamentEntity tournamentEntity) {
-        this.tournament = tournamentEntity;
+    public void setTournament(TournamentEntity tournament) {
+        this.tournament = tournament;
     }
 }

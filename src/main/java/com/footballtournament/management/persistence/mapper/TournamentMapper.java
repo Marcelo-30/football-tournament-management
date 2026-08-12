@@ -21,6 +21,7 @@ public interface TournamentMapper {
     Tournament toDomain(TournamentEntity entity);
 
     @InheritInverseConfiguration
+    @Mapping(target = "matches", ignore = true)
     TournamentEntity toEntity(Tournament domain);
 
     @AfterMapping

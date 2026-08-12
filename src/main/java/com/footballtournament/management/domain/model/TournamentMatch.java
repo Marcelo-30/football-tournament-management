@@ -5,8 +5,13 @@ import java.time.LocalDateTime;
 public class TournamentMatch {
 
     private Integer matchId;
-    private String homeTeam;
-    private String awayTeam;
+
+    private Integer homeTeamId;
+    private String homeTeamName;
+
+    private Integer awayTeamId;
+    private String awayTeamName;
+
     private LocalDateTime scheduledAt;
 
     public TournamentMatch() {
@@ -14,13 +19,17 @@ public class TournamentMatch {
 
     public TournamentMatch(
             Integer matchId,
-            String homeTeam,
-            String awayTeam,
+            Integer homeTeamId,
+            String homeTeamName,
+            Integer awayTeamId,
+            String awayTeamName,
             LocalDateTime scheduledAt
     ) {
         this.matchId = matchId;
-        this.homeTeam = homeTeam;
-        this.awayTeam = awayTeam;
+        this.homeTeamId = homeTeamId;
+        this.homeTeamName = homeTeamName;
+        this.awayTeamId = awayTeamId;
+        this.awayTeamName = awayTeamName;
         this.scheduledAt = scheduledAt;
     }
 
@@ -32,20 +41,36 @@ public class TournamentMatch {
         this.matchId = matchId;
     }
 
-    public String getHomeTeam() {
-        return homeTeam;
+    public Integer getHomeTeamId() {
+        return homeTeamId;
     }
 
-    public void setHomeTeam(String homeTeam) {
-        this.homeTeam = homeTeam;
+    public void setHomeTeamId(Integer homeTeamId) {
+        this.homeTeamId = homeTeamId;
     }
 
-    public String getAwayTeam() {
-        return awayTeam;
+    public String getHomeTeamName() {
+        return homeTeamName;
     }
 
-    public void setAwayTeam(String awayTeam) {
-        this.awayTeam = awayTeam;
+    public void setHomeTeamName(String homeTeamName) {
+        this.homeTeamName = homeTeamName;
+    }
+
+    public Integer getAwayTeamId() {
+        return awayTeamId;
+    }
+
+    public void setAwayTeamId(Integer awayTeamId) {
+        this.awayTeamId = awayTeamId;
+    }
+
+    public String getAwayTeamName() {
+        return awayTeamName;
+    }
+
+    public void setAwayTeamName(String awayTeamName) {
+        this.awayTeamName = awayTeamName;
     }
 
     public LocalDateTime getScheduledAt() {
