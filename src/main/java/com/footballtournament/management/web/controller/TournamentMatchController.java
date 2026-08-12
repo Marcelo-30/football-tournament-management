@@ -1,9 +1,9 @@
 package com.footballtournament.management.web.controller;
 
+import static com.footballtournament.management.web.response.ResponseHeader.MESSAGE;
 import com.footballtournament.management.domain.model.TournamentMatch;
 import com.footballtournament.management.service.TournamentMatchService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,12 +51,8 @@ public class TournamentMatchController {
             responseCode = "500",
             description = "Internal server error"
     )
+
     public ResponseEntity<List<TournamentMatch>> findAll(
-            @Parameter(
-                    description = "Optional team name used to filter matches",
-                    example = "Tigres",
-                    required = false
-            )
             @RequestParam(required = false) String team
     ) {
         if (team != null && !team.isBlank()) {
@@ -64,13 +60,35 @@ public class TournamentMatchController {
                     matchService.findByTeam(team);
 
             if (matches.isEmpty()) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .header(
+                                MESSAGE,
+                                "No tournament matches were found for team: "
+                                        + team
+                        )
+                        .build();
             }
 
-            return ResponseEntity.ok(matches);
+            return ResponseEntity
+                    .ok()
+                    .header(
+                            MESSAGE,
+                            "Tournament matches retrieved successfully"
+                    )
+                    .body(matches);
         }
 
-        return ResponseEntity.ok(matchService.findAll());
+        List<TournamentMatch> matches =
+                matchService.findAll();
+
+        return ResponseEntity
+                .ok()
+                .header(
+                        MESSAGE,
+                        "Tournament matches retrieved successfully"
+                )
+                .body(matches);
     }
 
     @GetMapping("/{id}")
@@ -90,16 +108,29 @@ public class TournamentMatchController {
             responseCode = "500",
             description = "Internal server error"
     )
+
     public ResponseEntity<TournamentMatch> findById(
-            @Parameter(description = "Tournament match ID", example = "1",
-                    required = true)
-            @PathVariable() Integer id
+            @PathVariable Integer id
     ) {
-        return matchService
-                .findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(
-                        () -> ResponseEntity.notFound().build()
+        return matchService.findById(id)
+                .map(match ->
+                        ResponseEntity
+                                .ok()
+                                .header(
+                                        MESSAGE,
+                                        "Tournament match retrieved successfully"
+                                )
+                                .body(match)
+                )
+                .orElseGet(() ->
+                        ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .header(
+                                        MESSAGE,
+                                        "Tournament match with ID " + id
+                                                + " was not found"
+                                )
+                                .build()
                 );
     }
 
@@ -122,19 +153,31 @@ public class TournamentMatchController {
             responseCode = "500",
             description = "Internal server error"
     )
+
     public ResponseEntity<List<TournamentMatch>> findByTournamentId(
-            @Parameter(description = "Tournament ID", example = "1",
-                    required = true)
-            @PathVariable() Integer tournamentId
+            @PathVariable Integer tournamentId
     ) {
         List<TournamentMatch> matches =
                 matchService.findByTournamentId(tournamentId);
 
         if (matches.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .header(
+                            MESSAGE,
+                            "No matches were found for tournament with ID "
+                                    + tournamentId
+                    )
+                    .build();
         }
 
-        return ResponseEntity.ok(matches);
+        return ResponseEntity
+                .ok()
+                .header(
+                        MESSAGE,
+                        "Tournament matches retrieved successfully"
+                )
+                .body(matches);
     }
 
     @PostMapping("/tournament/{tournamentId}")
@@ -176,22 +219,29 @@ public class TournamentMatchController {
             responseCode = "500",
             description = "Internal server error"
     )
-    public ResponseEntity<TournamentMatch> save(
-            @Parameter(description = "ID of the tournament to which the match belongs", example = "1",
-                    required = true)
-            @PathVariable() Integer tournamentId,
 
+    public ResponseEntity<TournamentMatch> save(
+            @PathVariable Integer tournamentId,
             @RequestBody TournamentMatch tournamentMatch
     ) {
-        return matchService
-                .save(tournamentId, tournamentMatch)
+        return matchService.save(tournamentId, tournamentMatch)
                 .map(savedMatch ->
                         ResponseEntity
                                 .status(HttpStatus.CREATED)
+                                .header(
+                                        MESSAGE,
+                                        "Tournament match created successfully"
+                                )
                                 .body(savedMatch)
                 )
-                .orElseGet(
-                        () -> ResponseEntity.notFound().build()
+                .orElseGet(() ->
+                        ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .header(
+                                        MESSAGE,
+                                        "Tournament or one of the teams was not found"
+                                )
+                                .build()
                 );
     }
 
@@ -218,18 +268,30 @@ public class TournamentMatchController {
             responseCode = "500",
             description = "Internal server error"
     )
+
     public ResponseEntity<Void> deleteById(
-            @Parameter(description = "Tournament match ID", example = "1",
-                    required = true)
-            @PathVariable() Integer id
+            @PathVariable Integer id
     ) {
         boolean deleted = matchService.deleteById(id);
 
         if (!deleted) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .header(
+                            MESSAGE,
+                            "Tournament match with ID " + id
+                                    + " was not found"
+                    )
+                    .build();
         }
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .header(
+                        MESSAGE,
+                        "Tournament match deleted successfully"
+                )
+                .build();
     }
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgument(
@@ -237,6 +299,10 @@ public class TournamentMatchController {
     ) {
         return ResponseEntity
                 .badRequest()
+                .header(
+                        MESSAGE,
+                        exception.getMessage()
+                )
                 .body(exception.getMessage());
     }
 }
