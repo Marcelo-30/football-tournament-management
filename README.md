@@ -269,6 +269,34 @@ X-Response-Message: Tournament created successfully
 
 Use `curl -i`, Postman, or the browser developer tools to inspect this header.
 
+## Flutter Development Integration
+
+The existing Flutter app lives in `../Mobile/login_rive_animation`. Its README
+contains platform-specific commands, architecture and the exact DTO fields used.
+Spring Boot uses port 8080 by default. Use the bundled wrapper on Windows:
+
+```powershell
+$env:DB_USERNAME = 'postgres'
+$env:DB_PASSWORD = 'your_actual_password'
+$env:SPRING_PROFILES_ACTIVE = 'dev'
+.\mvnw.cmd spring-boot:run
+```
+
+The `dev` profile enables CORS only for `http://localhost:3000` and
+`http://127.0.0.1:3000`, matching `flutter run -d chrome --web-port=3000`.
+Override `CORS_ALLOWED_ORIGINS` with a comma-separated list of exact origins if
+needed. GET, POST, DELETE and OPTIONS are permitted, and `X-Response-Message`
+is exposed to the browser. This configuration is inactive outside `dev` and
+does not change authentication or API contracts.
+
+Android Emulator reaches the API at `http://10.0.2.2:8080`; Windows and local
+Flutter Web use `http://localhost:8080`. Physical devices need the server's LAN
+IP, configured through Flutter's `--dart-define=API_BASE_URL=...`.
+
+`DevelopmentCorsConfigurationTest` checks allowed/rejected origins and profile
+isolation without a database. The original application-context tests require
+PostgreSQL. Run all tests with `.\mvnw.cmd -B -ntp test`.
+
 ## Running Tests
 
 Make sure PostgreSQL is running and the configured test database credentials are valid. Then run:
